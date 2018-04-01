@@ -25,6 +25,7 @@ public abstract class VStage extends Stage {
     private String name = "";
     public ArrayList<Actor> bgList;
     private float cutWidth, cutHeight;
+    private boolean isStretching=false;//是否拉伸比例适配
 
     public HashMap<String, Object> getIntent() {
         return intent;
@@ -38,6 +39,12 @@ public abstract class VStage extends Stage {
     
     public VStage(VGame game) {
         super(new ScalingViewport(Scaling.stretch, game.WIDTH, game.HEIGHT));
+        set(game);
+    }
+
+    public VStage(VGame game,boolean isStretching) {
+        super(new ScalingViewport(Scaling.stretch, game.WIDTH, game.HEIGHT));
+        this.isStretching=isStretching;
         set(game);
     }
 
@@ -73,6 +80,7 @@ public abstract class VStage extends Stage {
     public void resize(float width, float height) {
         changing(width, height);
         getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        if(isStretching)return;
         float bl = getWidth() / getHeight() * Gdx.graphics.getHeight() / Gdx.graphics.getWidth();
         if (bl < 1) {
             cutWidth = (1 - bl) * getWidth() / 2f;
@@ -211,34 +219,38 @@ public abstract class VStage extends Stage {
         return bgList;
     }
 
-    public void setBackground(String imgName) {
+    public Image setBackground(String imgName) {
         Image bg = game.getImage(imgName).getActor();
         bgList.add(bg);
+        return bg;
     }
 
-    public void setBackground(String imgName, Color color) {
+    public Image setBackground(String imgName, Color color) {
         Image bg = game.getImage(imgName, game.WIDTH, game.HEIGHT)
                 .setColor(color).getActor();
         bgList.add(bg);
+        return bg;
     }
 
     public void setBackground(Actor bg) {
         bgList.add(bg);
     }
 
-    public void setBackground(Color color) {
+    public Image setBackground(Color color) {
         Image bg = game.getImage(game.WIDTH, game.HEIGHT, color).getActor();
         bgList.add(bg);
+        return bg;
     }
 
-    public void setBackground(Color color1, Color color2) {
-        Actor bg = new ActorGradient(game.WIDTH, game.HEIGHT, color1, color2);
+    public ActorGradient setBackground(Color color1, Color color2) {
+        ActorGradient bg = new ActorGradient(game.WIDTH, game.HEIGHT, color1, color2);
         bgList.add(bg);
+        return bg;
     }
 
     public Group createSuperRoot() {
         Group SRoot = new Group();
-        SRoot.setSize(game.WIDTH + getCutWidth() * 2.5f, game.HEIGHT + getCutHeight() * 2.5f);
+        SRoot.setSize(getFullWidth(), getFullHeight());
         SRoot.setPosition(game.getCenterX(), game.getCenterY(), Align.center);
         return SRoot;
     }
