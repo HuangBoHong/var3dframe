@@ -828,37 +828,42 @@ public abstract class VGame implements ApplicationListener {
             }
         } while (stage == null);
     }
-
+    //插入并显示一个Stage
     public <T> void addStage(Class<T> type) {
         HashMap<String, Object> intent = new HashMap<>();
         intent.put("from", stage);
         addStage(type, intent);
     }
-
+    //移除当前Stage，并显示前一个Stage
     public void removeStage() {
         HashMap<String, Object> intent = new HashMap<>();
         intent.put("from", stage);
         removeStage(intent);
     }
-
+    //插入并显示一个Stage，Stage间传输的数据放在intent里
     public <T> void addStage(Class<T> type, HashMap<String, Object> intent) {
         stageStack.push(type);
         setStage(type, type.getName(), intent);
-//        getStage(type).setIntent(intent);
     }
-
+   //移除当前Stage，并显示前一个Stage，Stage间传输的数据放在intent里
     public void removeStage(HashMap<String, Object> intent) {
-        if(stageStack.size() > 0)
+        if(stageStack.size() > 1)
         {
             stageStack.pop();
-            if(stageStack.size() > 0)
-            {
                 setStage(stageStack.peek(), stageStack.peek().getName(), intent);
-//                getStage(stageStack.peek()).setIntent(intent);
-            }
+        }
+        else
+        {
+            //如果堆栈中只存在一个Stage，则显示退出对话框（重写exit()）
+            exit();
         }
     }
-
+    protected void exit() {
+    }
+    public HashMap<String, VStage> getPool()
+    {
+        return pool;
+    }
     public Stack<Class> getStageStack()
     {
         return stageStack;
